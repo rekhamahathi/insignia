@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <script src="./metawidget-core.min.js"></script>
+    <style>
+        p {
+            text-align: center;
+        }
+        #metawidget {
+            border: 1px solid #cccccc;
+            width: 400px;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 50px auto;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <h1>
+        This is a coding challenge for Insignia Financial
+    </h1>
+    <div id="metawidget"></div>
+    <button onClick="saveData()">
+        Add Data
+    </button>
+    <button onClick="addChild()">
+        Add Children
+    </button>
+
+</div>
+
+<script type="text/javascript">
+    // Define object to hold data
+    var dataToInspect = {
+        name: "Rekha",
+        age: "12",
+        email: "test@test.com",
+        // Nested address
+        address : {
+            city: "Sydney",
+            state: "NSW",
+            zipCode: "2000"
+        },
+        // One-To-Many Relation with childrenl,
+        children: [
+        {name: "child1", hobby: "tennis"},
+        {name: "child2", hobby: "badminton"}
+        ]
+    };
+
+    // Define json schema for metawidget
+    var schema = {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          age: { type: "number", minimum: 0, maximum: 130 },
+          email: { type: "string", format: "email" },
+          address: {
+            type: "object",
+            properties: {
+              city: { type: "string" },
+              state: { type: "string" },
+              zipCode: { type: "string" }
+            }
+          },
+          children: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                name: { type: "string" },
+                hobby: { type: "string" }
+              }
+            }
+          }
+        }
+  };
+
+    // Initialize metawidget
+    var mw = new metawidget.Metawidget( document.getElementById( 'metawidget' ));
+    mw.toInspect = dataToInspect;
+    mw.inspectionResult = schema;
+
+    // Build widgets
+    mw.buildWidgets();
+
+    // function to save data to the console
+    function saveData() {
+        const formData = mw.toInspect;
+        var consoleData = JSON.stringify(formData, null, 1);  // Converts to a pretty printed JSON
+        console.log("Data to check: ", formData);
+    }
+
+    // This just adds a static data to the existing object. Just to show how to add a nested data to the object
+    function addChild() {
+        dataToInspect.children.push({ name: "child3", hobby: "swimming" });
+        mw.buildWidgets();
+    }
+
+    // function to save data via REST
+    function postData() {
+        fetch('/api/user', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+
+    }
+</script>
+</body>
+</html>
